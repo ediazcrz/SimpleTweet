@@ -46,6 +46,7 @@ class TweetsAdapter(private val context: Context, private val tweets: ArrayList<
             binding.tvBody.text = tweet.body
             binding.tvScreenName.text = "\u0040${tweet.user.screenName}"
             binding.tvTimestamp.text = TimeFormatter.getTimeDifference(tweet.createdAt)
+            binding.tvDot.text = "\u2022"
 
             Glide.with(binding.root)
                     .load(tweet.user.publicImageUrl)
