@@ -1,13 +1,11 @@
 package com.codepath.apps.restclienttemplate.models;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /*
  * This is a temporary, sample model that demonstrates the basic structure
