@@ -44,7 +44,7 @@ class TweetsAdapter(private val context: Context, private val tweets: ArrayList<
     inner class TweetsViewHolder(private val binding: ItemTweetBinding): ViewHolder(binding.root) {
         fun bind(tweet: Tweet) {
             binding.tvBody.text = tweet.body
-            binding.tvScreenName.text = tweet.user.screenName
+            binding.tvScreenName.text = "\u0040${tweet.user.screenName}"
             binding.tvTimestamp.text = TimeFormatter.getTimeDifference(tweet.createdAt)
 
             Glide.with(binding.root)
