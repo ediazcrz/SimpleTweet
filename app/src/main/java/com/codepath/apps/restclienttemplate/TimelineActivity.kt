@@ -102,7 +102,7 @@ class TimelineActivity : AppCompatActivity() {
                     tweetAdapter.addAll(Gson().fromJson(jsonArray.toString(), typeToken))
                     swipeContainer.isRefreshing = false
                 } catch (e: JSONException) {
-                    Log.e(TAG, "Json exception", e)
+                    Log.e(TAG, "Json exception for populateHomeTimeline", e)
                 }
             }
 
