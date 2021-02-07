@@ -2,10 +2,105 @@ package com.codepath.apps.restclienttemplate
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Adapter
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.codepath.apps.restclienttemplate.databinding.ActivityTimelineBinding
+import com.codepath.apps.restclienttemplate.databinding.ItemTweetBinding
+import com.codepath.apps.restclienttemplate.models.Tweet
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import okhttp3.Headers
+import org.json.JSONException
+
+const val TAG = "TimelineActivity"
 
 class TimelineActivity : AppCompatActivity() {
+    val tweets = arrayListOf<Tweet>()
+    private val client: TwitterClient = TwitterApp.getRestClient(this)
+    private lateinit var tweetAdapter: TweetsAdapter
+    private lateinit var timelineBinding: ActivityTimelineBinding
+    private lateinit var swipeContainer: SwipeRefreshLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_timeline)
+        timelineBinding = ActivityTimelineBinding.inflate(layoutInflater)
+        setContentView(timelineBinding.root)
+
+        swipeContainer = timelineBinding.swipeContainer
+
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+        swipeContainer.setOnRefreshListener {
+            populateHomeTimeline()
+        }
+
+        // Init the list of tweets, adapter and layout manager
+        tweetAdapter = TweetsAdapter(this, tweets)
+        val rvTweets: RecyclerView = timelineBinding.rvTweets
+        val layoutManager = LinearLayoutManager(this)
+
+        // Recycler view setup: layout manager and the adapter
+        rvTweets.adapter = tweetAdapter
+        rvTweets.layoutManager = layoutManager
+
+        val scrollListener = object: EndlessRecyclerViewScrollListener(layoutManager) {
+            override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                Log.i(TAG, "onLoadMore $page")
+                loadMoreData()
+            }
+        }
+
+        // Adds the scroll listener to RecyclerView
+        rvTweets.addOnScrollListener(scrollListener)
+
+        populateHomeTimeline()
+    }
+
+    private fun loadMoreData() {
+        // Send an API request to retrieve appropriate paginated data
+        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
+        client.getNextPageOfTweets(object: JsonHttpResponseHandler() {
+            override fun onSuccess(statusCode: Int, headers: Headers?, json: JSON?) {
+                Log.i(TAG, "onSuccess for loadMoreData: ${json.toString()}")
+            }
+
+            override fun onFailure(statusCode: Int, headers: Headers?, response: String?, throwable: Throwable?) {
+                Log.e(TAG, "onFailure for loadMoreData: $response", throwable)
+            }
+        }, tweets.get(tweets.size - 1).id)
+
+        //  --> Deserialize and construct new model objects from the API response
+        //  --> Append the new data objects to the existing set of items inside the array of items
+        //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
+    }
+
+    private fun populateHomeTimeline() {
+        client.getHomeTimeline(object: JsonHttpResponseHandler() {
+            override fun onSuccess(statusCode: Int, headers: Headers?, json: JSON?) {
+                Log.i(TAG, "onSuccess for populateHomeTimeline: ${json.toString()}")
+                val jsonArray = json?.jsonArray
+                val typeToken = object : TypeToken<List<Tweet>>() {}.type
+
+                try {
+                    tweetAdapter.clear()
+                    tweetAdapter.addAll(Gson().fromJson(jsonArray.toString(), typeToken))
+                    swipeContainer.isRefreshing = false
+                } catch (e: JSONException) {
+                    Log.e(TAG, "Json exception", e)
+                }
+            }
+
+            override fun onFailure(statusCode: Int, headers: Headers?, response: String?, throwable: Throwable?) {
+                Log.e(TAG, "onFailure for populateHomeTimeline: $response", throwable)
+            }
+        })
     }
 }
