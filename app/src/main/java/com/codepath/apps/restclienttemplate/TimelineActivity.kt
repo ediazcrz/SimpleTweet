@@ -70,16 +70,24 @@ class TimelineActivity : AppCompatActivity() {
         client.getNextPageOfTweets(object: JsonHttpResponseHandler() {
             override fun onSuccess(statusCode: Int, headers: Headers?, json: JSON?) {
                 Log.i(TAG, "onSuccess for loadMoreData: ${json.toString()}")
+
+                //  --> Deserialize and construct new model objects from the API response
+                //  --> Append the new data objects to the existing set of items inside the array of items
+                //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
+                val jsonArray = json?.jsonArray
+                val typeToken = object : TypeToken<List<Tweet>>() {}.type
+
+                try {
+                    tweetAdapter.addAll(Gson().fromJson(jsonArray.toString(), typeToken))
+                } catch (e: JSONException) {
+                    Log.e(TAG, "Json exception for loadMoreData", e)
+                }
             }
 
             override fun onFailure(statusCode: Int, headers: Headers?, response: String?, throwable: Throwable?) {
                 Log.e(TAG, "onFailure for loadMoreData: $response", throwable)
             }
-        }, tweets.get(tweets.size - 1).id)
-
-        //  --> Deserialize and construct new model objects from the API response
-        //  --> Append the new data objects to the existing set of items inside the array of items
-        //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
+        }, tweets[tweets.size - 1].id)
     }
 
     private fun populateHomeTimeline() {
