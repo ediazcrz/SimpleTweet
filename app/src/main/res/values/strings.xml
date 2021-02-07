@@ -9,4 +9,5 @@
     <string name="tvScreenName_text">ediaz188</string>
     <string name="tvBody_text">Sample Tweet</string>
     <string name="tvTimestamp_text">1h</string>
+    <string name="tvDot">\u2022</string>
 </resources>
