@@ -52,6 +52,7 @@ class TweetsAdapter(private val context: Context, private val tweets: ArrayList<
             Glide.with(binding.root)
                     .load(tweet.user.publicImageUrl)
                     .centerInside()
+                    .circleCrop()
                     .into(binding.ivProfileImage)
         }
     }
