@@ -11,4 +11,6 @@
     <string name="tvTimestamp_text">1h</string>
     <string name="tvDot">\u2022</string>
     <string name="tvName_text">Profile Name</string>
+    <string name="etCompose_text">What\'s happening\?"</string>
+    <string name="btnTweet_text">Tweet</string>
 </resources>
