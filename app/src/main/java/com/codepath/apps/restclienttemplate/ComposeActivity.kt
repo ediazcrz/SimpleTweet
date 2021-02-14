@@ -1,16 +1,14 @@
 package com.codepath.apps.restclienttemplate
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.codepath.apps.restclienttemplate.databinding.ActivityComposeBinding
 import com.codepath.apps.restclienttemplate.models.Tweet
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import okhttp3.Headers
 import org.json.JSONException
 
