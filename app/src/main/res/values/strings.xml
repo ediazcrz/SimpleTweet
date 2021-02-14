@@ -13,4 +13,5 @@
     <string name="tvName_text">Profile Name</string>
     <string name="etCompose_text">What\'s happening\?"</string>
     <string name="btnTweet_text">Tweet</string>
+    <string name="tvCount_text">140</string>
 </resources>
