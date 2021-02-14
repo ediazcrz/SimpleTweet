@@ -105,9 +105,6 @@ class TimelineActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if(item?.itemId == R.id.compose) {
-            // Compose icon has been selected
-            Toast.makeText(this, "Compose!", Toast.LENGTH_SHORT).show()
-
             // Navigate to the compose activity
             val intent = Intent(this, ComposeActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE)
