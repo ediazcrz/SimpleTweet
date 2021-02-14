@@ -1,7 +1,10 @@
 package com.codepath.apps.restclienttemplate
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +30,28 @@ class ComposeActivity : AppCompatActivity() {
 
         val etCompose = composeBinding.etCompose
         val btnTweet = composeBinding.btnTweet
+        val tvCount = composeBinding.tvCount
+        val defaultTextColor = tvCount.textColors.defaultColor
+
+        etCompose.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                // Fires right as the text is being changed (even supplies the range of text)
+                if (count > MAX_TWEET_LENGTH) {
+                    btnTweet.isEnabled = false;
+                    tvCount.setTextColor(Color.RED);
+                }
+
+                if (count <= MAX_TWEET_LENGTH && !btnTweet.isEnabled) {
+                    btnTweet.isEnabled = true
+                    tvCount.setTextColor(defaultTextColor)
+                }
+
+                tvCount.text = "${MAX_TWEET_LENGTH - count}"
+            }
+        })
 
         // Set click listener on button
         btnTweet.setOnClickListener() {
@@ -41,7 +66,6 @@ class ComposeActivity : AppCompatActivity() {
                 Toast.makeText(this, "Sorry, your tweet is too long", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-
 
             Toast.makeText(this, tweetContent, Toast.LENGTH_LONG).show()
 
