@@ -1,12 +1,17 @@
 package com.codepath.apps.restclienttemplate
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Adapter
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.codepath.apps.restclienttemplate.databinding.ActivityComposeBinding
 import com.codepath.apps.restclienttemplate.databinding.ActivityTimelineBinding
 import com.codepath.apps.restclienttemplate.databinding.ItemTweetBinding
 import com.codepath.apps.restclienttemplate.models.Tweet
@@ -17,13 +22,15 @@ import okhttp3.Headers
 import org.json.JSONException
 
 const val TAG = "TimelineActivity"
+const val REQUEST_CODE = 20
 
 class TimelineActivity : AppCompatActivity() {
-    val tweets = arrayListOf<Tweet>()
+    private val tweets = arrayListOf<Tweet>()
     private val client: TwitterClient = TwitterApp.getRestClient(this)
     private lateinit var tweetAdapter: TweetsAdapter
     private lateinit var timelineBinding: ActivityTimelineBinding
     private lateinit var swipeContainer: SwipeRefreshLayout
+    private lateinit var rvTweets: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +51,7 @@ class TimelineActivity : AppCompatActivity() {
 
         // Init the list of tweets, adapter and layout manager
         tweetAdapter = TweetsAdapter(this, tweets)
-        val rvTweets: RecyclerView = timelineBinding.rvTweets
+        rvTweets = timelineBinding.rvTweets
         val layoutManager = LinearLayoutManager(this)
 
         // Recycler view setup: layout manager and the adapter
@@ -88,6 +95,43 @@ class TimelineActivity : AppCompatActivity() {
                 Log.e(TAG, "onFailure for loadMoreData: $response", throwable)
             }
         }, tweets[tweets.size - 1].id)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if(item?.itemId == R.id.compose) {
+            // Compose icon has been selected
+            Toast.makeText(this, "Compose!", Toast.LENGTH_SHORT).show()
+
+            // Navigate to the compose activity
+            val intent = Intent(this, ComposeActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE)
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            // Get data from the intent (tweet)
+            val tweet = data?.getParcelableExtra<Tweet>("tweet")
+
+            // Update the recycler view with the tweet
+            // Modify data source of tweets
+            if (tweet != null) {
+                tweets.add(0, tweet)
+                // Update the adapter
+                tweetAdapter.notifyItemInserted(0)
+                rvTweets.smoothScrollToPosition(0)
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun populateHomeTimeline() {
