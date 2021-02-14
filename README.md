@@ -43,6 +43,7 @@ Here's a walkthrough of implemented user stories:
 GIF created with [peek](https://github.com/phw/peek).
 
 ## Notes
+<em>Describe any challenges encountered while building the app.</em>
 
 There were not any major challenges experienced during this part of the assignment.
 
